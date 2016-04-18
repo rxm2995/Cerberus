@@ -1,80 +1,80 @@
-
+!function()
 {
-
+	function init()
 	{
-
-
-
+		//Setting up initial spans
+		let arrayOfParagraphs = document.querySelectorAll("p");
+		for(let i = 0; i < arrayOfParagraphs.length; i++)
 		{
-
+			arrayOfParagraphs[i].innerHTML = "<span>"+arrayOfParagraphs[i].innerHTML+"</span>";
 		}
 
-
-
-
-
-
-
+		//Background corruption
+		let msUntilFullBackgroundChange = 30000;	//30sec
+		let bgChangeFunctionInterval = 75;	//Function will be called once every 75 ms
+		let elapsedTime = 0;	//Counter (measured in ms)
+		let backgroundElement = document.querySelector("body");
+		let bgChangeIntervalID = setInterval(function()
 		{
-
-
-
-
-
+			//Gradually turning background from #FFFFFF (255, 255, 255) to #E8D0A9 (232, 208, 169)
+			elapsedTime += bgChangeFunctionInterval;
+			//IMPORTANT: rgb values MUST be integers, otherwise style defaults to #FFFFFF.
+			backgroundElement.style.backgroundColor = "rgb("+Math.round(255-23*elapsedTime/msUntilFullBackgroundChange)+", "+Math.round(255-47*elapsedTime/msUntilFullBackgroundChange)+", "+Math.round(255-86*elapsedTime/msUntilFullBackgroundChange)+")";
+			if(elapsedTime >= msUntilFullBackgroundChange)
 			{
-
-
+				console.log("Full change completed");
+				window.clearInterval(bgChangeIntervalID);
 			}
-		}
+		}, bgChangeFunctionInterval);
 
-
-
-
+		//text corruption
+		let textCorruptionInterval = 1000;
+		let textCorruptionID = setInterval(function()
 		{
+			let elementList = document.querySelectorAll("span");
+			let elementToModify = Math.floor(Math.random()*elementList.length);
 
-
-
-
-
+			let randomDecider = Math.random()*100;
+			if(randomDecider < 90)
 			{
-
-
-
-
-
-			}
-
-
-		}
-
-
-
-
-
-
-
-		{
-
-
-
-
-			{
-
-
-
+				//This is completely broken, but I left it because the bugs allow the code to leak into the webpage and turn the art into a sort of codework.
+				//Don't fix this; it's better broken.
+				let textToModify = elementList[elementToModify].innerHTML;
+				randomDecider = Math.floor(Math.random()*textToModify.length);
+				elementList[elementToModify].innerHTML = textToModify.substring(0, randomDecider)+'</span><span>'+textToModify.substring(randomDecider);
 			}
 
+			alterElement(elementList[elementToModify]);
+		}, textCorruptionInterval);
 
+		//load images
+		var can = new Array(11);
+		var ctx = new Array(11);
+		var img = new Array(11);
 
-		}
-
-
-
-
+		for (let i = 0; i < can.length; i++)
 		{
+			can[i] = document.getElementById("canvas"+i);
+			ctx[i] = can[i].getContext('2d');
+			img[i] = new Image();
 
+			img[i].onload = function () {
+				can[i].width = img[i].width;
+				can[i].height = img[i].height;
+				ctx[i].drawImage(img[i], 0, 0, img[i].width, img[i].height);
+			};
+
+			img[i].src = "img/"+i+".png";
 
 		}
+
+		//image corruption
+		let imageCorruptionInterval = 1000;
+		let imageCorruptionID = setInterval(function()
+		{
+			var index = Math.floor(Math.random()*ctx.length);
+			corruptImage(can[index], ctx[index]);
+		}, imageCorruptionInterval);
 
 	}
 
@@ -249,5 +249,5 @@
 
 		}
 
-
-}
+	window.onload = init;
+}();
